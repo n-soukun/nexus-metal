@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./style.css" />
+        <title>lol-custom-hud</title>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <script src="./script.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="main-board">
+                <div class="team-area">
+                    <div class="team-logo-area">
+                        <img
+                            class="team-logo"
+                            src="./img/blue_team_icon.png"
+                            id="BlueTeamLogo"
+                        />
+                    </div>
+                    <div class="win-score" id="OrderWinScore">
+                        <div class="score-dot"></div>
+                        <div class="score-dot"></div>
+                        <div class="score-dot"></div>
+                    </div>
+                    <div class="team-name-area">
+                        <div class="team-name" id="OrderTeamName">SAPP</div>
+                        <div class="team-subname" id="OrderTeamSubName">
+                            Team 1
+                        </div>
+                    </div>
+                </div>
+                <div class="team-score-area blue">
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="./img/horde_icon.png" />
+                        </div>
+                        <div class="score-value" id="OrderHorde">0</div>
+                    </div>
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="img/turret_icon.png" />
+                        </div>
+                        <div class="score-value" id="OrderTurret">0</div>
+                    </div>
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="./img/gold_icon.png" />
+                        </div>
+                        <div class="score-value gold" id="OrderGold">2.5K</div>
+                    </div>
+                    <div class="kill-score" id="OrderKill">0</div>
+                </div>
+                <div class="tournament-logo-area">
+                    <img
+                        id="tournamentLogo"
+                        class="tournament-logo"
+                        src="./img/tournament_logo.png"
+                    />
+                </div>
+                <div class="team-score-area red">
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="./img/horde_icon.png" />
+                        </div>
+                        <div class="score-value" id="ChaosHorde">0</div>
+                    </div>
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="img/turret_icon.png" />
+                        </div>
+                        <div class="score-value" id="ChaosTurret">0</div>
+                    </div>
+                    <div class="score-area">
+                        <div class="score-icon">
+                            <img src="./img/gold_icon.png" />
+                        </div>
+                        <div class="score-value gold" id="ChaosGold">2.5k</div>
+                    </div>
+                    <div class="kill-score" id="ChaosKill">0</div>
+                </div>
+                <div class="team-area">
+                    <div class="team-logo-area">
+                        <img
+                            class="team-logo"
+                            src="./img/red_team_icon.png"
+                            id="ChaosTeamLogo"
+                        />
+                    </div>
+                    <div class="win-score" id="ChaosWinScore">
+                        <div class="score-dot"></div>
+                        <div class="score-dot"></div>
+                        <div class="score-dot"></div>
+                    </div>
+                    <div class="team-name-area">
+                        <div class="team-name" id="ChaosTeamName">RUBY</div>
+                        <div class="team-subname" id="ChaosTeamSubName">
+                            Team 1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sub-board">
+                <div class="indicators-area blue">
+                    <div class="indicators">
+                        <div class="indicators-icon-area">
+                            <img
+                                id="OrderFirstBlood"
+                                class="indicators-icon"
+                                src="./img/feats/Blue_First_Blood_0.png"
+                            />
+                        </div>
+                        <div class="indicators-icon-area">
+                            <img
+                                id="OrderFirstBrick"
+                                class="indicators-icon"
+                                src="./img/feats/Blue_Tower_Not_Active.png"
+                            />
+                        </div>
+                        <div class="indicators-icon-area">
+                            <img
+                                id="OrderKillMonster"
+                                class="indicators-icon"
+                                src="./img/feats/Blue_PIP_Active_0.png"
+                            />
+                        </div>
+                    </div>
+                    <div class="indicators hidden" id="OrderDragonArea"></div>
+                    <div class="indicators hidden" id="OrderAtakhanArea">
+                        <div class="indicators-icon-area">
+                            <img
+                                id="OrderAtakhan"
+                                class="indicators-icon"
+                                src="./img/Atakhan.png"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="game-time" id="GameTime">00:00</div>
+                <div class="indicators-area red">
+                    <div class="indicators">
+                        <div class="indicators-icon-area">
+                            <img
+                                id="ChaosFirstBlood"
+                                class="indicators-icon"
+                                src="./img/feats/Red_First_Blood_0.png"
+                            />
+                        </div>
+                        <div class="indicators-icon-area">
+                            <img
+                                id="ChaosFirstBrick"
+                                class="indicators-icon"
+                                src="./img/feats/Red_Tower_Not_Active.png"
+                            />
+                        </div>
+                        <div class="indicators-icon-area">
+                            <img
+                                id="ChaosKillMonster"
+                                class="indicators-icon"
+                                src="./img/feats/Red_PIP_Active_0.png"
+                            />
+                        </div>
+                    </div>
+                    <div class="indicators hidden" id="ChaosDragonArea"></div>
+                    <div class="indicators hidden" id="ChaosAtakhanArea">
+                        <div class="indicators-icon-area">
+                            <img
+                                id="OrderAtakhan"
+                                class="indicators-icon"
+                                src="./img/Atakhan.png"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
