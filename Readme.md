@@ -2,7 +2,7 @@
 
 [English, [日本語](./Readme.ja.md)]
 
-![Thumbnail image](./work.soukun.prime/thumbnail.jpg "thumbnail")
+![Thumbnail image](./work.soukun.metal/thumbnail.jpg "thumbnail")
 
 ## How to install
 
