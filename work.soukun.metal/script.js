@@ -1,58 +1,69 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* global $ */
 
-const BlueFirstBloodIcons = [
-    "Blue_First_Blood_0.png",
-    "Blue_First_Blood_1.png",
-    "Blue_First_Blood_2.png",
-    "Blue_First_Blood_3.png",
-];
+// デフォルトロゴ
+const DefaultBlueLogo = "./img/default_order_logo.png";
+const DefaultRedLogo = "./img/default_chaos_logo.png";
+const DefaultTournamentLogo = "./img/default_tournament_logo.png";
 
-const BlueFirstBrickIcons = [
-    "Blue_Tower_Not_Active.png",
-    "Blue_Tower_Active.png",
-];
-
-const BlueKillMonsterIcons = [
-    "Blue_PIP_Active_0.png",
-    "Blue_PIP_Active_1.png",
-    "Blue_PIP_Active_2.png",
-    "Blue_PIP_Active_3.png",
-];
-
-const RedFirstBloodIcons = [
-    "Red_First_Blood_0.png",
-    "Red_First_Blood_1.png",
-    "Red_First_Blood_2.png",
-    "Red_First_Blood_3.png",
-];
-
-const RedFirstBrickIcons = ["Red_Tower_Not_Active.png", "Red_Tower_Active.png"];
-
-const RedKillMonsterIcons = [
-    "Red_PIP_Active_0.png",
-    "Red_PIP_Active_1.png",
-    "Red_PIP_Active_2.png",
-    "Red_PIP_Active_3.png",
-];
+// 力の偉業アイコン
+const Icons = {
+    blue: {
+        firstBlood: [
+            "img/feats/Blue_First_Blood_0.png",
+            "img/feats/Blue_First_Blood_1.png",
+            "img/feats/Blue_First_Blood_2.png",
+            "img/feats/Blue_First_Blood_3.png",
+        ],
+        firstBrick: [
+            "img/feats/Blue_Tower_Not_Active.png",
+            "img/feats/Blue_Tower_Active.png",
+        ],
+        killMonster: [
+            "img/feats/Blue_PIP_Active_0.png",
+            "img/feats/Blue_PIP_Active_1.png",
+            "img/feats/Blue_PIP_Active_2.png",
+            "img/feats/Blue_PIP_Active_3.png",
+        ],
+    },
+    red: {
+        firstBlood: [
+            "img/feats/Red_First_Blood_0.png",
+            "img/feats/Red_First_Blood_1.png",
+            "img/feats/Red_First_Blood_2.png",
+            "img/feats/Red_First_Blood_3.png",
+        ],
+        firstBrick: [
+            "img/feats/Red_Tower_Not_Active.png",
+            "img/feats/Red_Tower_Active.png",
+        ],
+        killMonster: [
+            "img/feats/Red_PIP_Active_0.png",
+            "img/feats/Red_PIP_Active_1.png",
+            "img/feats/Red_PIP_Active_2.png",
+            "img/feats/Red_PIP_Active_3.png",
+        ],
+    },
+};
 
 const url = new URL(window.location.href);
 url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
 
 // WebSocketサーバーのURLを指定
-const webSocketServerURL = `${url.protocol}//${url.host}/ws`;
+// const webSocketServerURL = `${url.protocol}//${url.host}/ws`;
+const webSocketServerURL = "ws://localhost:3002/ws"; // ローカルでテストする場合
 
 const socket = new WebSocket(webSocketServerURL);
 
-// WebSocketが接続されたときの処理
+// 接続開始
 socket.addEventListener("open", (event) => {
-    console.log("WebSocket接続が開かれました: ", event);
+    console.log("WebSocket | Open: ", event);
     socket.send(JSON.stringify({ type: "request-current-data" }));
 });
 
-// WebSocketでメッセージが受信されたときの処理
+// メッセージ受信
 socket.addEventListener("message", (event) => {
-    console.log("WebSocketメッセージを受信しました: ", event.data);
+    console.log("WebSocket | Message ", event.data);
     const receivedData = JSON.parse(event.data);
     if (receivedData.type === "game-stats") {
         updateHUD(receivedData.data);
@@ -63,194 +74,159 @@ socket.addEventListener("message", (event) => {
     }
 });
 
-// WebSocketが切断されたときの処理
+// 接続終了
 socket.addEventListener("close", (event) => {
-    console.log("WebSocket接続が閉じられました: ", event);
+    console.log("WebSocket | Closed: ", event);
 });
 
-// WebSocketでエラーが発生したときの処理
+// エラー発生
 socket.addEventListener("error", (event) => {
-    console.error("WebSocketエラーが発生しました: ", event);
+    console.error("WebSocket | Error: ", event);
 });
 
+/**
+ * HUDのゲームステータス情報を更新する
+ * @param {Object} gameStats - ゲームステータス情報
+ */
 function updateHUD(gameStats) {
     console.log("Updating HUD with game stats: ", gameStats);
 
+    // ブルーチームのスコア更新
+    updateTeamScore("blue", gameStats.blueTeam);
+
+    // レッドチームのスコア更新
+    updateTeamScore("red", gameStats.redTeam);
+}
+
+/**
+ * HUDのカスタマイズ情報を更新する
+ * @param {Object} customize - カスタマイズ情報
+ */
+function updateHudCustomize(customize) {
+    console.log("Updating HUD customize: ", customize);
+
     // ブルーチーム
-    $("#OrderKill").text(gameStats.blueTeam.kills);
-    $("#OrderGold").text(gameStats.blueTeam.golds);
-    $("#OrderTurret").text(gameStats.blueTeam.turrets);
-    $("#OrderHorde").text(gameStats.blueTeam.killHordes);
-    $("#OrderFirstBlood").attr(
-        "str",
-        "img/feats/" +
-            BlueFirstBloodIcons[gameStats.blueTeam.featsProgress.firstBloods],
-    );
-    $("#OrderFirstBrick").attr(
+    updateTeamUI("blue", customize, DefaultBlueLogo);
+
+    // レッドチーム
+    updateTeamUI("red", customize, DefaultRedLogo);
+
+    // トーナメントロゴ
+    $("#tournamentLogo").attr(
         "src",
-        "img/feats/" +
-            BlueFirstBrickIcons[
-                Number(gameStats.blueTeam.featsProgress.firstBricks)
-            ],
+        customize.tournamentLogo || DefaultTournamentLogo
     );
-    $("#OrderKillMonster").attr(
+}
+
+/**
+ * チームのスコア情報を更新する
+ * @param {string} team - "blue" or "red"
+ * @param {Object} score - スコア情報
+ */
+function updateTeamScore(team, score) {
+    const teamPrefix = team === "blue" ? "Order" : "Chaos";
+
+    $(`#${teamPrefix}Kill`).text(score.kills);
+    $(`#${teamPrefix}Gold`).text(score.golds);
+    $(`#${teamPrefix}Turret`).text(score.turrets);
+    $(`#${teamPrefix}Horde`).text(score.killHordes);
+    $(`#${teamPrefix}FirstBlood`).attr(
         "src",
-        "img/feats/" +
-            BlueKillMonsterIcons[gameStats.blueTeam.featsProgress.killMonsters],
+        Icons[team].firstBlood[Number(score.featsProgress.firstBloods)]
+    );
+    $(`#${teamPrefix}FirstBrick`).attr(
+        "src",
+
+        Icons[team].firstBrick[Number(score.featsProgress.firstBricks)]
+    );
+    $(`#${teamPrefix}KillMonster`).attr(
+        "src",
+        Icons[team].killMonster[score.featsProgress.killMonsters]
     );
 
-    // ブルーチームドラゴン
-    const blueDragonArea = $("#OrderDragonArea");
-    const dragons = gameStats.blueTeam.dragons; // ドラゴン名の配列
+    // ドラゴン
+    const dragonArea = $(`#${teamPrefix}DragonArea`);
+    const dragons = score.dragons; // ドラゴン名の配列
     if (dragons.length > 0) {
-        // OrderDragonAreaのhiddenクラスを削除
-        blueDragonArea.removeClass("hidden");
+        // DragonAreaのhiddenクラスを削除
+        dragonArea.removeClass("hidden");
     } else {
         // dragonsが空の場合、OrderDragonAreaにhiddenクラスを追加
-        blueDragonArea.addClass("hidden");
+        dragonArea.addClass("hidden");
     }
     const html = `
         ${dragons
             .map(
                 (dragon) =>
-                    `<div class="indicators-icon-area"><img src="img/dragons/${dragon}_Dragon.png" alt="${dragon}" title="${dragon}" /></div>`,
+                    `<div class="indicators-icon-area"><img src="img/dragons/${dragon}_Dragon.png" alt="${dragon}" title="${dragon}" /></div>`
             )
             .join("")}
     `;
-    blueDragonArea.html(html);
+    dragonArea.html(html);
 
-    // ブルーチームアタカン
-    const blueAtakhanArea = $("#OrderAtakhanArea");
-    if (gameStats.blueTeam.killAtakhans > 0) {
+    // アタカン
+    const atakhanArea = $(`#${teamPrefix}AtakhanArea`);
+    if (score.killAtakhans > 0) {
         // OrderAtakhanAreaのhiddenクラスを削除
-        blueAtakhanArea.removeClass("hidden");
+        atakhanArea.removeClass("hidden");
     } else {
         // killAtakhansが0の場合、OrderAtakhanAreaにhiddenクラスを追加
-        blueAtakhanArea.addClass("hidden");
-    }
-
-    // レッドチーム
-    $("#ChaosKill").text(gameStats.redTeam.kills);
-    $("#ChaosGold").text(gameStats.redTeam.golds);
-    $("#ChaosTurret").text(gameStats.redTeam.turrets);
-    $("#ChaosHorde").text(gameStats.redTeam.killHordes);
-    $("#ChaosFirstBlood").attr(
-        "src",
-        "img/feats/" +
-            RedFirstBloodIcons[gameStats.redTeam.featsProgress.firstBloods],
-    );
-    $("#ChaosFirstBrick").attr(
-        "src",
-        "img/feats/" +
-            RedFirstBrickIcons[
-                Number(gameStats.redTeam.featsProgress.firstBricks)
-            ],
-    );
-    $("#ChaosKillMonster").attr(
-        "src",
-        "img/feats/" +
-            RedKillMonsterIcons[gameStats.redTeam.featsProgress.killMonsters],
-    );
-
-    // レッドチームドラゴン
-    const redDragonArea = $("#ChaosDragonArea");
-    const redDragons = gameStats.redTeam.dragons; // ドラゴン名の配列
-    if (redDragons.length > 0) {
-        // ChaosDragonAreaのhiddenクラスを削除
-        redDragonArea.removeClass("hidden");
-    } else {
-        // dragonsが空の場合、ChaosDragonAreaにhiddenクラスを追加
-        redDragonArea.addClass("hidden");
-    }
-    const redHtml = `
-        ${redDragons
-            .map(
-                (dragon) =>
-                    `<div class="indicators-icon-area"><img src="img/dragons/${dragon}_Dragon.png" alt="${dragon}" title="${dragon}" /></div>`,
-            )
-            .join("")}
-    `;
-    redDragonArea.html(redHtml);
-
-    // レッドチームアタカン
-    const redAtakhanArea = $("#ChaosAtakhanArea");
-    if (gameStats.redTeam.killAtakhans > 0) {
-        // ChaosAtakhanAreaのhiddenクラスを削除
-        redAtakhanArea.removeClass("hidden");
-    } else {
-        // killAtakhansが0の場合、ChaosAtakhanAreaにhiddenクラスを追加
-        redAtakhanArea.addClass("hidden");
+        atakhanArea.addClass("hidden");
     }
 }
 
-function updateHudCustomize(customize) {
-    // ブルーチーム
-    $("#OrderTeamName").text(customize.blueName || "ORDER");
-    if (customize.blueSubtitle) {
-        $("#OrderTeamSubName").removeClass("hidden");
-        $("#OrderTeamSubName").text(customize.blueSubtitle);
-    } else {
-        $("#OrderTeamSubName").addClass("hidden");
-    }
-    const blueWinScoreDots = $("#OrderWinScore .score-dot");
+/**
+ * チームのUIを更新する
+ * @param {string} team - "blue" or "red"
+ * @param {Object} data - カスタマイズデータ
+ * @param {string} defaultLogo - デフォルトのロゴ画像パス
+ */
+function updateTeamUI(team, customize, defaultLogo) {
+    const teamPrefix = team === "blue" ? "Order" : "Chaos";
 
-    // bo3の場合は2つ目まで表示
+    // チーム名
+    $(`#${teamPrefix}TeamName`).text(
+        customize[`${team}Name`] || teamPrefix.toUpperCase()
+    );
+
+    // サブタイトル
+    if (customize[`${team}Subtitle`]) {
+        $(`#${teamPrefix}TeamSubName`).removeClass("hidden");
+        $(`#${teamPrefix}TeamSubName`).text(customize[`${team}Subtitle`]);
+    } else {
+        $(`#${teamPrefix}TeamSubName`).addClass("hidden");
+    }
+
+    // 勝利数インジケーター
+    const winScoreDots = $(`#${teamPrefix}WinScore .score-dot`);
+
     if (customize.tournamentRule === "bo3") {
-        blueWinScoreDots.eq(2).addClass("hidden");
+        // bo3の場合は2つだけ表示
+        winScoreDots.eq(2).addClass("hidden");
     } else {
-        blueWinScoreDots.eq(2).removeClass("hidden");
+        winScoreDots.eq(2).removeClass("hidden");
     }
 
-    const wins = customize.blueWins || 0;
-    blueWinScoreDots.each((index, element) => {
+    const wins = customize[`${team}Wins`] || 0;
+    winScoreDots.each((index, element) => {
         if (index < wins) {
             $(element).addClass("active");
         } else {
             $(element).removeClass("active");
         }
     });
-    $("#BlueTeamLogo").attr(
+
+    // チームロゴ
+    $(`#${teamPrefix}TeamLogo`).attr(
         "src",
-        customize.blueLogo || "./img/blue_team_icon.png",
-    );
-
-    // レッドチーム
-    $("#ChaosTeamName").text(customize.redName || "CHAOS");
-    if (customize.redSubtitle) {
-        $("#ChaosTeamSubName").removeClass("hidden");
-        $("#ChaosTeamSubName").text(customize.redSubtitle);
-    } else {
-        $("#ChaosTeamSubName").addClass("hidden");
-    }
-    const redWinScoreDots = $("#ChaosWinScore .score-dot");
-
-    // bo3の場合は2つ目まで表示
-    if (customize.tournamentRule === "bo3") {
-        redWinScoreDots.eq(2).addClass("hidden");
-    } else {
-        redWinScoreDots.eq(2).removeClass("hidden");
-    }
-
-    const redWins = customize.redWins || 0;
-    redWinScoreDots.each((index, element) => {
-        if (index < redWins) {
-            $(element).addClass("active");
-        } else {
-            $(element).removeClass("active");
-        }
-    });
-    $("#ChaosTeamLogo").attr(
-        "src",
-        customize.redLogo || "./img/red_team_icon.png",
-    );
-
-    // トーナメントロゴ
-    $("#tournamentLogo").attr(
-        "src",
-        customize.tournamentLogo || "./img/tournament_logo.png",
+        customize[`${team}Logo`] || defaultLogo
     );
 }
 
+/**
+ * ゲーム時間を更新する
+ * @param {Object} time - ゲーム時間情報
+ */
 function updateGameTime(time) {
     const gameSeconds = time.seconds;
     // ゲーム時間の更新
