@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "themeId": "work.soukun.metal",
+  "name": "Metal",
+  "description": "The theme of nuXus",
+  "thumbnail": "thumbnail.jpg",
+  "width": 1160,
+  "height": 119,
+  "version": "1.0.0",
+  "author": "n-soukun",
+  "authorUrl": "https://github.com/n-soukun",
+  "license": "MIT",
+  "licenseUrl": "https://opensource.org/licenses/MIT"
+}
