@@ -50,8 +50,7 @@ const url = new URL(window.location.href);
 url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
 
 // WebSocketサーバーのURLを指定
-// const webSocketServerURL = `${url.protocol}//${url.host}/ws`;
-const webSocketServerURL = "ws://localhost:3002/ws"; // ローカルでテストする場合
+const webSocketServerURL = `${url.protocol}//${url.host}/ws`;
 
 const socket = new WebSocket(webSocketServerURL);
 
